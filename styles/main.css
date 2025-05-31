@@ -1,0 +1,152 @@
+/* Main styles for the calculator app */
+:root {
+  /* Color palette */
+  --primary-glow: #00e5ff;
+  --primary-dark: #00b8d4;
+  --background: #121212;
+  --button-bg: #000000;
+  --text-color: #ffffff;
+  --display-bg: #000000;
+  --display-text: #00e5ff;
+  --shadow-color: rgba(0, 229, 255, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: var(--background);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  position: relative;
+}
+
+header {
+  padding: clamp(16px, 4vw, 32px);
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: clamp(16px, 4vw, 32px);
+  color: var(--primary-glow);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
+}
+
+.subtitle {
+  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: clamp(16px, 4vw, 32px);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(16px, 4vw, 64px);
+  padding: clamp(16px, 4vw, 32px);
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.math-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(30, 30, 30, 1) 0%,
+    rgba(18, 18, 18, 1) 100%
+  );
+  opacity: 0.4;
+  z-index: -2;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  main {
+    padding: 12px;
+    gap: 24px;
+  }
+
+  .calculator,
+  .help-center {
+    width: 100%;
+    max-width: none;
+  }
+
+  .bubble-container {
+    height: 100px;
+    margin: 10px 0;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+  }
+
+  .glowing-orb {
+    display: none;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .calculator,
+  .help-center {
+    width: 90%;
+    max-width: 400px;
+  }
+
+  .bubble-container {
+    height: 120px;
+    margin: 15px 0;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  main {
+    gap: 32px;
+    padding: 24px;
+  }
+
+  .calculator {
+    max-width: 380px;
+  }
+
+  .help-center {
+    max-width: 300px;
+  }
+}
+
+@media (min-width: 1025px) {
+  main {
+    justify-content: center;
+    gap: 64px;
+  }
+}

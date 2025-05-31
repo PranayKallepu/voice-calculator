@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Command Simple Calculator</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/calculator.css" />
+    <link rel="stylesheet" href="styles/animations.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="math-bg"></div>
+    <div class="voice-overlay"></div>
+    <div class="history-overlay" onclick="toggleHistory()"></div>
+
+    <header>
+      <h1>VOICE COMMAND SIMPLE CALCULATOR</h1>
+      <p class="subtitle">
+        A Hands-Free Web Calculator with Voice Input and Audio Output
+      </p>
+    </header>
+
+    <main>
+      <div class="calculator">
+        <div class="display">
+          <button class="history" onclick="toggleHistory()">
+            <img src="public/history_image.svg" alt="History image" />
+          </button>
+          <div>
+            <div class="calculation-expression" id="expression">0</div>
+            <input type="text" class="result" id="result" value="0" readonly />
+          </div>
+        </div>
+
+        <!-- History Panel -->
+        <div id="history-panel" class="history-panel">
+          <div class="history-header">
+            <h3>Calculation History</h3>
+            <div class="history-controls">
+              <button onclick="clearHistory()" class="clear-history">
+                Clear History
+              </button>
+              <button onclick="toggleHistory()" class="close-history">×</button>
+            </div>
+          </div>
+          <ul id="history-list" class="history-list">
+            <!-- History items will be inserted here -->
+          </ul>
+        </div>
+
+        <div class="buttons">
+          <div class="row">
+            <button class="num-btn">1</button>
+            <button class="num-btn">2</button>
+            <button class="num-btn">3</button>
+            <button class="op-btn">+</button>
+          </div>
+          <div class="row">
+            <button class="num-btn">4</button>
+            <button class="num-btn">5</button>
+            <button class="num-btn">6</button>
+            <button class="op-btn">-</button>
+          </div>
+          <div class="row">
+            <button class="num-btn">7</button>
+            <button class="num-btn">8</button>
+            <button class="num-btn">9</button>
+            <button class="op-btn">x</button>
+          </div>
+          <div class="row">
+            <button class="num-btn">0</button>
+            <button class="num-btn">00</button>
+            <button class="func-btn" onclick="clearCalculator()">AC</button>
+            <button class="op-btn">/</button>
+          </div>
+          <div class="row">
+            <button class="voice-btn">
+              <img src="public/voice-image.svg" alt="Voice Input" />
+              <span class="voice-text">Voice Input</span>
+            </button>
+            <button style="color: green; font-size: 28px" class="eq-btn">
+              =
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="voice-circle">
+        <img src="public/voice-image.svg" alt="Voice Input" class="mic-icon" />
+      </div>
+
+      <div class="help-center">
+        <h2>Help Center</h2>
+        <p>Use these voice commands for operations:</p>
+        <ul>
+          <li><strong>plus</strong> - Addition (+)</li>
+          <li><strong>minus</strong> - Subtraction (-)</li>
+          <li><strong>times</strong> - Multiplication (×)</li>
+          <li><strong>divided by</strong> - Division (/)</li>
+        </ul>
+        <p>Example: "Tell me 2 plus 3"</p>
+        <p class="note">
+          NOTE : it clears display automatically after 15 seconds
+        </p>
+      </div>
+    </main>
+
+    <script src="scripts/calculator.js"></script>
+    <script src="scripts/voice.js"></script>
+    <script src="scripts/history.js"></script>
+  </body>
+</html>

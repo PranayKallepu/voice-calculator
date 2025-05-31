@@ -1,0 +1,184 @@
+/* Animations and special effects */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Add this new animation for the voice text */
+@keyframes voicePulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Voice circle animation */
+@keyframes voiceCirclePulse {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.calculator {
+  animation: glow 3s infinite;
+}
+
+.voice-btn {
+  position: relative;
+  overflow: visible;
+}
+
+.voice-btn::before,
+.voice-btn::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 229, 255, 0.2);
+  z-index: -1;
+  opacity: 0;
+}
+
+.voice-btn.voice-active::before {
+  animation: bubble 2s infinite;
+}
+
+.voice-btn.voice-active::after {
+  animation: bubble 2s infinite 1s;
+}
+
+/* For math symbols that float in the background */
+.math-bg::before {
+  content: "2<3 4>1 π α+β a(b+c) ∫";
+  position: absolute;
+  color: rgba(255, 255, 255, 0.03);
+  font-size: 3rem;
+  top: 20%;
+  right: 10%;
+  white-space: nowrap;
+}
+
+.math-bg::after {
+  content: "∑ f'(x) ∞ ∛ Δ";
+  position: absolute;
+  color: rgba(255, 255, 255, 0.02);
+  font-size: 4rem;
+  bottom: 15%;
+  left: 5%;
+  white-space: nowrap;
+}
+
+.voice-active .mic-icon {
+  animation: pulse 1s infinite;
+  color: var(--primary-glow);
+}
+
+/* Update the voice button active state */
+.voice-btn.voice-active .voice-text {
+  animation: voicePulse 1.5s infinite;
+  color: #4caf50;
+}
+
+.voice-btn.voice-active .mic-icon {
+  color: #4caf50;
+}
+
+.voice-circle {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: clamp(80px, 15vw, 120px);
+  height: clamp(80px, 15vw, 120px);
+  border: 2px solid var(--primary-glow);
+  border-radius: 50%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+}
+
+.voice-circle.active {
+  display: flex;
+  animation: voiceCirclePulse 1.5s infinite;
+}
+
+.voice-circle img {
+  width: clamp(30px, 8vw, 45px);
+  height: clamp(30px, 8vw, 45px);
+  filter: brightness(0) saturate(100%) invert(67%) sepia(51%) saturate(457%)
+    hue-rotate(118deg) brightness(95%) contrast(87%);
+}
+
+/* Voice overlay for background dimming */
+.voice-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 999;
+}
+
+.voice-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
