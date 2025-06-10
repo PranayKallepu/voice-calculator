@@ -4,159 +4,93 @@ document.addEventListener("DOMContentLoaded", () => {
   const expression = document.getElementById("expression");
   const buttons = document.querySelectorAll("button");
 
-  let currentInput = "0";
-  let previousInput = "";
-  let operation = null;
-  let resetInput = false;
-  let displayTimeout;
-  let isShowingExpression = true;
+  let expressionInput = "";
   let lastResult = "0";
+  let displayTimeout;
 
   // Function to clear calculator
   window.clearCalculator = () => {
-    currentInput = "0";
-    previousInput = "";
-    operation = null;
-    resetInput = false;
-    isShowingExpression = true;
+    expressionInput = "";
     display.value = "0";
     expression.textContent = `Ans = ${lastResult}`;
   };
 
-  // Function to update display
-  const updateDisplay = () => {
-    if (isShowingExpression) {
-      // Show the expression in the result display
-      if (operation && previousInput) {
-        display.value = `${previousInput} ${operation} ${currentInput}`;
-      } else {
-        display.value = currentInput;
-      }
+  // Function to update expression display
+  const updateExpression = () => {
+    if (expressionInput === "") {
+      expression.textContent = "0";
     } else {
-      // Show the result
-      display.value = currentInput;
+      expression.textContent = expressionInput;
     }
+  };
 
-    // Auto clear after 15 seconds
+  // Function to handle number input
+  const handleNumber = (number) => {
+    expressionInput += number;
+    display.value = expressionInput;
+    updateExpression();
+    resetTimeout();
+  };
+
+  // Function to handle operation input
+  const handleOperation = (op) => {
+    const mappedOp = op === "x" ? "*" : op;
+    expressionInput += mappedOp;
+    display.value = expressionInput;
+    updateExpression();
+    resetTimeout();
+  };
+
+  // Function to calculate the result of full expression
+  const calculate = () => {
+    try {
+      // Evaluate expression safely
+      const result = Function(
+        '"use strict"; return (' + expressionInput + ")"
+      )();
+      lastResult = String(result);
+      display.value = result;
+      expression.textContent = `${expressionInput} =`;
+      expressionInput = String(result); // Allow chaining
+      speakResult(`The answer is ${result}`);
+      saveToHistory(`${expression.textContent}`, result);
+    } catch (error) {
+      display.value = "Error";
+    }
+    resetTimeout();
+  };
+
+  // Auto-clear after 15 seconds
+  const resetTimeout = () => {
     clearTimeout(displayTimeout);
     displayTimeout = setTimeout(() => {
       clearCalculator();
     }, 15000);
   };
 
-  // Function to update expression
-  const updateExpression = () => {
-    if (!isShowingExpression) {
-      expression.textContent = `${previousInput} ${operation} ${currentInput} =`;
-    } else {
-      expression.textContent = "0";
-    }
+  // Dummy saveToHistory function (can be customized)
+  const saveToHistory = (expr, result) => {
+    console.log(`History: ${expr} = ${result}`);
   };
 
-  // Function to handle number input
-  const handleNumber = (number) => {
-    if (currentInput === "0" || resetInput) {
-      currentInput = number;
-      resetInput = false;
-    } else {
-      currentInput += number;
-    }
-    isShowingExpression = true;
-    updateDisplay();
-    updateExpression();
-  };
-
-  // Function to handle operation
-  const handleOperation = (op) => {
-    if (operation !== null) {
-      calculate();
-    }
-    previousInput = currentInput;
-    operation = op;
-    resetInput = true;
-    isShowingExpression = true;
-    updateDisplay();
-    updateExpression();
-  };
-
-  // Function to speak the result
+  // Dummy speakResult function (can be customized)
   const speakResult = (text) => {
     if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1; // Slightly slower than normal
-      utterance.pitch = 1.2; // Higher pitch for female voice
-      utterance.volume = 1;
-
-      // Get available voices and set a female voice
-      const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(
-        (voice) =>
-          voice.name.includes("female") || voice.name.includes("Female")
-      );
-      if (femaleVoice) {
-        utterance.voice = femaleVoice;
-      }
-
-      window.speechSynthesis.speak(utterance);
+      const utter = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utter);
     }
   };
 
-  // Function to calculate result
-  const calculate = () => {
-    let result;
-    const prev = parseFloat(previousInput);
-    const current = parseFloat(currentInput);
-
-    if (isNaN(prev) || isNaN(current)) return;
-
-    switch (operation) {
-      case "+":
-        result = prev + current;
-        break;
-      case "-":
-        result = prev - current;
-        break;
-      case "x":
-        result = prev * current;
-        break;
-      case "/":
-        result = prev / current;
-        break;
-      default:
-        return;
-    }
-
-    currentInput = String(result);
-    lastResult = String(result);
-    isShowingExpression = false;
-    updateDisplay();
-    updateExpression();
-
-    // Save calculation to history
-    const historyExpression = `${previousInput} ${operation} ${currentInput}`;
-    saveToHistory(historyExpression, result);
-
-    // Speak the result
-    speakResult(`The Answer is ${result}`);
-  };
-
-  // Add event listeners to buttons
+  // Handle button clicks
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      // Get button text content
       const buttonText = button.textContent.trim();
 
-      // Handle different button types
-      if (buttonText.match(/[0-9]/)) {
+      if (/[0-9]/.test(buttonText)) {
         handleNumber(buttonText);
       } else if (buttonText === "00") {
-        if (currentInput !== "0") {
-          currentInput += "00";
-          isShowingExpression = true;
-          updateDisplay();
-          updateExpression();
-        }
-      } else if (["+", "-", "x", "/"].includes(buttonText)) {
+        handleNumber("00");
+      } else if (["+", "-", "x", "/", "^", "%"].includes(buttonText)) {
         handleOperation(buttonText);
       } else if (buttonText === "=") {
         calculate();
@@ -164,15 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
         clearCalculator();
       }
 
-      // Add button press animation
+      // Add press animation
       button.classList.add("pressed");
-      setTimeout(() => {
-        button.classList.remove("pressed");
-      }, 100);
+      setTimeout(() => button.classList.remove("pressed"), 100);
     });
   });
 
-  // Initialize display
-  updateDisplay();
-  updateExpression();
+  // Initial display
+  display.value = "0";
+  expression.textContent = `Ans = ${lastResult}`;
 });

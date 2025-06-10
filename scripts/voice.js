@@ -8,6 +8,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const voiceCircle = document.querySelector(".voice-circle");
   const voiceOverlay = document.querySelector(".voice-overlay");
 
+  // Add test button for speech synthesis
+  const testButton = document.createElement("button");
+  testButton.textContent = "Test Speech";
+  testButton.style.margin = "10px";
+  document.body.appendChild(testButton);
+
+  testButton.addEventListener("click", () => {
+    speakResult(
+      "Testing speech synthesis. If you can hear this, the speech function is working!"
+    );
+  });
+
+  // --- Define the factorial function ---
+  const factorial = (n) => {
+    if (n < 0) {
+      return "Error: Factorial of negative number";
+    }
+    if (n === 0 || n === 1) {
+      return 1;
+    }
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+      result *= i;
+    }
+    return result;
+  };
+
   // Check if browser supports speech recognition
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -48,110 +75,41 @@ document.addEventListener("DOMContentLoaded", () => {
       const speechResult = event.results[0][0].transcript.toLowerCase();
       console.log("Speech recognized:", speechResult);
 
-      // Parse the speech result
-      const numbers = speechResult.match(/\d+/g);
+      // Convert spoken words to mathematical expression
+      let mathExpression = speechResult
+        .replace(/plus/g, "+")
+        .replace(/minus/g, "-")
+        .replace(/times|multiply|multiplied by|into/g, "*")
+        .replace(/divided by|divide/g, "/")
+        .replace(/power|to the power of/g, "^")
+        .replace(/square root|root of|root/g, "√")
+        .replace(/mod|modulo/g, "%")
+        .replace(/factorial|fact of|factor/g, "!");
 
-      if (!numbers || numbers.length < 2) {
-        alert(
-          "Please speak two numbers for calculation. For example: '5 plus 3'"
-        );
-        toggleMicText(false);
-        voiceButton.classList.remove("voice-active");
-        return;
-      }
+      // includes only numbers, operators
+      mathExpression = mathExpression.replace(/[^0-9+\-*\/\^√%!()\s.]/g, "");
+      console.log(mathExpression);
 
-      const firstNumber = numbers[0];
-      const secondNumber = numbers[1];
-      let operation = null;
+      // Show the expression in the display
+      expression.textContent = mathExpression;
+      display.value = mathExpression;
 
-      // Determine operation
-      if (
-        speechResult.includes("+") ||
-        speechResult.includes("add") ||
-        speechResult.includes("plus")
-      ) {
-        operation = "+";
-      } else if (
-        speechResult.includes("-") ||
-        speechResult.includes("subtract") ||
-        speechResult.includes("minus")
-      ) {
-        operation = "-";
-      } else if (
-        speechResult.includes("x") ||
-        speechResult.includes("multiply") ||
-        speechResult.includes("times")
-      ) {
-        operation = "x";
-      } else if (
-        speechResult.includes("/") ||
-        speechResult.includes("divide") ||
-        speechResult.includes("divided by")
-      ) {
-        operation = "/";
-      }
+      try {
+        // Evaluate the expression
+        const result = Function(
+          '"use strict"; return (' + mathExpression + ")"
+        )();
 
-      if (!operation) {
-        alert(
-          "Please specify an operation. Use words like 'plus', 'minus', 'times', or 'divided by'"
-        );
-        toggleMicText(false);
-        voiceButton.classList.remove("voice-active");
-        return;
-      }
+        // Update display with result
+        display.value = result;
+        // Remove any trailing dots and format the expression
+        expression.textContent = `${mathExpression} = ${result}`;
 
-      // Perform calculation
-      let result;
-      const num1 = parseFloat(firstNumber);
-      const num2 = parseFloat(secondNumber);
-
-      if (operation === "/" && num2 === 0) {
-        alert("Cannot divide by zero!");
-        toggleMicText(false);
-        voiceButton.classList.remove("voice-active");
-        return;
-      }
-
-      switch (operation) {
-        case "+":
-          result = num1 + num2;
-          break;
-        case "-":
-          result = num1 - num2;
-          break;
-        case "x":
-          result = num1 * num2;
-          break;
-        case "/":
-          result = num1 / num2;
-          break;
-      }
-
-      // Update both display and expression
-      display.value = result;
-      expression.textContent = `${firstNumber} ${operation} ${secondNumber} =`;
-      console.log("result : ", result);
-
-      // Speak the result
-      if ("speechSynthesis" in window) {
-        const utterance = new SpeechSynthesisUtterance(
-          `The Answer is ${result}`
-        );
-        utterance.rate = 0.9;
-        utterance.pitch = 1.2; // Higher pitch for female voice
-        utterance.volume = 1;
-
-        // Get available voices and set a female voice
-        const voices = window.speechSynthesis.getVoices();
-        const femaleVoice = voices.find(
-          (voice) =>
-            voice.name.includes("female") || voice.name.includes("Female")
-        );
-        if (femaleVoice) {
-          utterance.voice = femaleVoice;
-        }
-
-        window.speechSynthesis.speak(utterance);
+        // Speak the result
+        speakResult(`The answer is ${result}`);
+      } catch (error) {
+        console.error("Error evaluating expression:", error);
+        alert("Invalid mathematical expression. Please try again.");
       }
 
       toggleMicText(false);

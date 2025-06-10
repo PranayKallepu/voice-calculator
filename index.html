@@ -11,6 +11,11 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
+
+    <script src="scripts/calculator.js" defer></script>
+    <script src="scripts/voice.js" defer></script>
+    <script src="scripts/history.js" defer></script>
+    <script src="scripts/speech.js" defer></script>
   </head>
   <body>
     <div class="math-bg"></div>
@@ -32,9 +37,10 @@
           </button>
           <div>
             <div class="calculation-expression" id="expression">0</div>
-            <input type="text" class="result" id="result" value="0" readonly />
+            <input type="text" class="result" id="result" value="0" />
           </div>
         </div>
+        <p class="speech-result"></p>
 
         <!-- History Panel -->
         <div id="history-panel" class="history-panel">
@@ -58,24 +64,28 @@
             <button class="num-btn">2</button>
             <button class="num-btn">3</button>
             <button class="op-btn">+</button>
+            <button class="op-btn">^</button>
           </div>
           <div class="row">
             <button class="num-btn">4</button>
             <button class="num-btn">5</button>
             <button class="num-btn">6</button>
             <button class="op-btn">-</button>
+            <button class="op-btn">√</button>
           </div>
           <div class="row">
             <button class="num-btn">7</button>
             <button class="num-btn">8</button>
             <button class="num-btn">9</button>
             <button class="op-btn">x</button>
+            <button class="op-btn">%</button>
           </div>
           <div class="row">
             <button class="num-btn">0</button>
             <button class="num-btn">00</button>
             <button class="func-btn" onclick="clearCalculator()">AC</button>
             <button class="op-btn">/</button>
+            <button class="op-btn">!</button>
           </div>
           <div class="row">
             <button class="voice-btn">
@@ -97,20 +107,28 @@
         <h2>Help Center</h2>
         <p>Use these voice commands for operations:</p>
         <ul>
-          <li><strong>plus</strong> - Addition (+)</li>
-          <li><strong>minus</strong> - Subtraction (-)</li>
-          <li><strong>times</strong> - Multiplication (×)</li>
-          <li><strong>divided by</strong> - Division (/)</li>
+          <li><strong>plus</strong> - Addition (+) e.g., "2 plus 3"</li>
+          <li><strong>minus</strong> - Subtraction (-) e.g., "10 minus 5"</li>
+          <li><strong>times</strong> - Multiplication (×) e.g., "2 into 3"</li>
+          <li>
+            <strong>divided by</strong> - Division (/) e.g., "10 divided by 5"
+          </li>
         </ul>
-        <p>Example: "Tell me 2 plus 3"</p>
-        <p class="note">
-          NOTE : it clears display automatically after 15 seconds
-        </p>
+        <ul>
+          <li><strong>power</strong> - Exponentiation (e.g., "2 power 3")</li>
+          <li>
+            <strong>square root</strong> - Square root (e.g., "square root of
+            16")
+          </li>
+          <li><strong>mod</strong> - Modulus (e.g., "10 mod 3")</li>
+          <li><strong>factorial</strong> - Factorial (e.g., "factorial 5")</li>
+        </ul>
+        <p>Examples:</p>
+        <ul>
+          <li>"What is 2 plus 3 minus 4 into 5?"</li>
+        </ul>
+        <p class="note">NOTE: Display clears automatically after 15 seconds</p>
       </div>
     </main>
-
-    <script src="scripts/calculator.js"></script>
-    <script src="scripts/voice.js"></script>
-    <script src="scripts/history.js"></script>
   </body>
 </html>
