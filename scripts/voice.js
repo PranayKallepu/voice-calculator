@@ -22,16 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Define the factorial function ---
   const factorial = (n) => {
-    if (n < 0) {
-      return "Error: Factorial of negative number";
-    }
-    if (n === 0 || n === 1) {
-      return 1;
-    }
+    if (n < 0) return NaN;
+    if (n === 0 || n === 1) return 1;
     let result = 1;
-    for (let i = 2; i <= n; i++) {
-      result *= i;
-    }
+    for (let i = 2; i <= n; i++) result *= i;
     return result;
   };
 
@@ -46,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    // Function to toggle mic text and voice circle
     const toggleMicText = (isListening) => {
       if (isListening) {
         micIcon.textContent = "🎤";
@@ -63,49 +56,49 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Voice button click event
     voiceButton.addEventListener("click", () => {
-      voiceButton.classList.add("voice-active");
       toggleMicText(true);
       recognition.start();
     });
 
-    // Handle speech recognition results
     recognition.onresult = (event) => {
       const speechResult = event.results[0][0].transcript.toLowerCase();
       console.log("Speech recognized:", speechResult);
 
-      // Convert spoken words to mathematical expression
       let mathExpression = speechResult
         .replace(/plus/g, "+")
         .replace(/minus/g, "-")
-        .replace(/times|multiply|multiplied by|into/g, "*")
+        .replace(/\b(x|times|multiply|multiplied by|into)\b/g, "*") // include "x"
         .replace(/divided by|divide/g, "/")
         .replace(/power|to the power of/g, "^")
-        .replace(/square root|root of|root/g, "√")
-        .replace(/mod|modulo/g, "%")
-        .replace(/factorial|fact of|factor/g, "!");
+        .replace(
+          /\b(square root of|square root|root of|root)\s*(\d+(\.\d+)?|\([^()]*\))/g,
+          (_, __, val) => `√${val}`
+        ) // attach val to √
+        .replace(/modulo|mod/g, "%")
+        .replace(/factorial of (\d+)/g, (_, num) => `${num}!`)
+        .replace(/(\d+)\s*factorial/g, (_, num) => `${num}!`);
 
-      // includes only numbers, operators
-      mathExpression = mathExpression.replace(/[^0-9+\-*\/\^√%!()\s.]/g, "");
-      console.log(mathExpression);
-
-      // Show the expression in the display
+      mathExpression = mathExpression.replace(/[^0-9+\-*/^√%!().\s]/g, "");
       expression.textContent = mathExpression;
       display.value = mathExpression;
 
       try {
-        // Evaluate the expression
+        let sanitized = mathExpression
+          .replace(/\^/g, "**") // power
+          .replace(
+            /√(\d+(\.\d+)?|\([^()]*\))/g,
+            (_, val) => `Math.sqrt(${val})`
+          ) // improved √ handling
+          .replace(/(\d+|\([^()]*\))!/g, (_, val) => `factorial(${val})`); // factorial
+
         const result = Function(
-          '"use strict"; return (' + mathExpression + ")"
-        )();
+          "factorial",
+          `"use strict"; return (${sanitized})`
+        )(factorial);
 
-        // Update display with result
         display.value = result;
-        // Remove any trailing dots and format the expression
         expression.textContent = `${mathExpression} = ${result}`;
-
-        // Speak the result
         speakResult(`The answer is ${result}`);
       } catch (error) {
         console.error("Error evaluating expression:", error);
@@ -113,19 +106,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       toggleMicText(false);
-      voiceButton.classList.remove("voice-active");
     };
 
     recognition.onend = () => {
       toggleMicText(false);
-      voiceButton.classList.remove("voice-active");
     };
 
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
       alert("Error in speech recognition. Please try again.");
       toggleMicText(false);
-      voiceButton.classList.remove("voice-active");
     };
   } else {
     voiceButton.disabled = true;
@@ -133,5 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(
       "Your browser does not support speech recognition. Please use a modern browser."
     );
+  }
+
+  // Speak result
+  function speakResult(text) {
+    if ("speechSynthesis" in window) {
+      const utter = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utter);
+    }
   }
 });
